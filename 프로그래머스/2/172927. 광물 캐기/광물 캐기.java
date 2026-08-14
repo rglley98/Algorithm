@@ -1,49 +1,79 @@
-import java.util.*;
-
 class Solution {
+    int[] picks;
+    String[] minerals;
+    
+    int size;
+    int[] perm;
+    
+    int answer;
+    
+    void makePerm(int depth) {
+       if(depth == size) {
+           int mineralIdx = 0;
+           int fatigue = 0;
+           for(int pick : perm) {
+               int count = 5;
+               
+               while(count > 0 && mineralIdx < minerals.length) {
+                   String mineral = minerals[mineralIdx++];
+                   
+                   if(pick == 0) {
+                       fatigue++;
+                   } else if(pick == 1) {
+                       if(mineral.equals("diamond"))
+                           fatigue += 5;
+                       else
+                           fatigue += 1;
+                   } else {
+                       if(mineral.equals("diamond"))
+                           fatigue += 25;
+                       else if(mineral.equals("iron"))
+                           fatigue += 5;
+                       else 
+                           fatigue += 1;
+                   }
+                   
+                   count--;
+                   
+                   if(fatigue > answer)
+                       return;
+               }
+           }
+           
+           answer = Math.min(answer, fatigue);
+           
+           return;
+       } 
+        
+        for(int pick = 0; pick < 3; pick++) {
+            if(picks[pick] == 0)
+                continue;
+            
+            perm[depth] = pick;
+            picks[pick]--;
+            makePerm(depth + 1);
+            picks[pick]++;
+        }
+    }
+    
     public int solution(int[] picks, String[] minerals) {
-        int answer = 0;
+        this.picks = picks;
+        this.minerals = minerals;
         
-        int pickCount = picks[0] + picks[1] + picks[2];
-        int maxMineralIdx = Math.min(pickCount * 5, minerals.length) - 1;
-        
-        List<int[]> infoList = new ArrayList<>();
-        for(int headIdx = 0; headIdx <= maxMineralIdx; headIdx += 5) {
-            int diamond = 0;
-            int iron = 0;
-            int stone = 0;
-            
-            for(int idx = headIdx; idx < headIdx + 5 && idx <= maxMineralIdx; idx++) {
-                String mineral = minerals[idx];
-                
-                if(mineral.equals("diamond"))
-                    diamond++;
-                else if(mineral.equals("iron"))
-                    iron++;
-                else
-                    stone++;
-            }
-            
-            int fatigue = diamond * 25 + iron * 5 + stone;
-            infoList.add(new int[]{diamond, iron, stone, fatigue});
+        int totalPicks = 0;
+        for(int num : picks) {
+            totalPicks += num;
         }
         
-        Collections.sort(infoList, (o1, o2) -> o2[3] - o1[3]);
-        
-        for(int[] info : infoList) {
-            if(picks[0] > 0) {
-                answer += (info[0] + info[1] + info[2]);
-                picks[0]--;
-            } else if(picks[1] > 0) {
-                answer += (info[0] * 5 + info[1] + info[2]);
-                picks[1]--;
-            } else if(picks[2] > 0) {
-                answer += info[3];
-                picks[2]--;
-            } else {
-                break;
-            }
+        int requirePicks = minerals.length / 5;
+        if(minerals.length % 5 != 0) {
+            requirePicks++;
         }
+        
+        size = Math.min(totalPicks, requirePicks);
+        perm = new int[size];
+        answer = Integer.MAX_VALUE;
+        makePerm(0);
         
         return answer;
     }
