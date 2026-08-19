@@ -1,28 +1,28 @@
 class Solution {
-    public int solution(int storey) {
-        int answer = 0;
-        
-        while(storey > 0) {
-            int firstDigit = storey % 10;
-            int secondDigit = storey / 10 % 10;
-            
-            if(firstDigit < 5) {
-                answer += firstDigit;
-            } else if(firstDigit > 5) {
-                answer += 10 - firstDigit;
-                storey += 10;
-            } else {
-                if(secondDigit >= 5) {
-                    answer += 5;
-                    storey += 10;
-                } else {
-                    answer += 5;
-                }
-            }
-            
-            storey /= 10;
+    int answer = 0;
+    int length;
+
+    void DFS(int count, int num) {
+        if(count >= answer) {
+            return;
         }
-        
+
+        if(num == 0) {
+            answer = Math.min(answer, count);
+            return;
+        }
+
+        int lastNum = num % 10;
+
+        DFS(count + lastNum, num / 10);
+        DFS(count + (10 - lastNum), num / 10 + 1);
+    }
+
+    public int solution(int storey) {
+        answer = Integer.MAX_VALUE;
+
+        DFS(0, storey);
+
         return answer;
     }
 }
