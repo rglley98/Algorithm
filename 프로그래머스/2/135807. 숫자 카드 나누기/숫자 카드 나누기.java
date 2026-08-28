@@ -1,42 +1,56 @@
 class Solution {
-    int getGcd(int num1, int num2) {
-        while(num2 != 0) {
-            int remainder = num1 % num2;
-            num1 = num2;
-            num2 = remainder;
-        }
-        
-        return num1;
-    }
-    
-    boolean canDivide(int divisor, int[] arr) {
-        for(int idx = 0; idx < arr.length; idx++) {
-            if(arr[idx] % divisor == 0)
-                return false;
-        }
-        
-        return true;
-    }
-    
+
     public int solution(int[] arrayA, int[] arrayB) {
         int gcdA = arrayA[0];
         for(int idx = 1; idx < arrayA.length; idx++) {
-            gcdA = getGcd(gcdA, arrayA[idx]);
+            gcdA = getGCD(gcdA, arrayA[idx]);
         }
         
         int gcdB = arrayB[0];
         for(int idx = 1; idx < arrayB.length; idx++) {
-            gcdB = getGcd(gcdB, arrayB[idx]);
+            gcdB = getGCD(gcdB, arrayB[idx]);
         }
         
         int answer = 0;
         
-        if(canDivide(gcdA, arrayB))
-            answer = gcdA;
+        boolean isPossible = true;
+        for(int num : arrayB) {
+            if(num % gcdA == 0) {
+                isPossible = false;
+                break;
+            }
+        }
         
-        if(canDivide(gcdB, arrayA))
-            answer = Math.max(gcdB, answer);
+        if(isPossible) {
+            answer = gcdA;
+        }
+        
+        isPossible = true;
+        for(int num : arrayA) {
+            if(num % gcdB == 0) {
+                isPossible = false;
+                break;
+            }
+        }
+        
+        if(isPossible) {
+            answer = Math.max(answer, gcdB);
+        }
         
         return answer;
+    }
+    
+    int getGCD(int num1, int num2) {
+        while(true) {
+            int remain = num1 % num2;
+            num1 = num2;
+            num2 = remain;
+            
+            if(num2 == 0) {
+                break;
+            }
+        }
+        
+        return num1;
     }
 }
