@@ -1,77 +1,60 @@
 import java.util.*;
 
 class Solution {
-    Map<String, Integer> map = new TreeMap<>();
-
-    boolean[] selected;
-
-    void makeCourse(String input, int size, int depth, int startIdx) {
-        if (depth == size) {
-            String course = "";
-
-            for (char ch = 'A'; ch <= 'Z'; ch++) {
-                if (selected[ch - 'A']) {
-                    course += ch;
-                }
-            }
-
-            map.put(course, map.getOrDefault(course, 0) + 1);
-            return;
-        }
-
-        for (int chIdx = startIdx; chIdx < input.length(); chIdx++) {
-            int selectedIdx = input.charAt(chIdx) - 'A';
-
-            if (selected[selectedIdx]) {
-                continue;
-            }
-
-            selected[selectedIdx] = true;
-            makeCourse(input, size, depth + 1, chIdx + 1);
-            selected[selectedIdx] = false;
-        }
-    }
-
+    String[] orders;
+    int[] course;
+    Map<String, Integer> map = new HashMap<>();
+    
     public String[] solution(String[] orders, int[] course) {
-        List<String> list = new ArrayList<>();
-
-        for (int size : course) {
-            map.clear();
-
-            for (String order : orders) {
-                if (order.length() < size) {
-                    continue;
-                }
-
-                selected = new boolean[26];
-                makeCourse(order, size, 0, 0);
-            }
-
+        this.orders = orders;
+        this.course = course;
+        
+        for(String order : orders) {
+            char[] arr = order.toCharArray();
+            Arrays.sort(arr);
+            makeComb(arr, 0, "");
+        }
+        
+        Map<Integer, Integer> maxMap = new HashMap<>();
+        for(int length : course) {
             int maxCount = 0;
-
-            for (String key : map.keySet()) {
-                maxCount = Math.max(maxCount, map.get(key));
+            for(String key : map.keySet()) {
+                if(key.length() == length) {
+                    maxCount = Math.max(maxCount, map.get(key));
+                }
             }
-
-            if (maxCount < 2) {
-                continue;
-            }
-
-            for (String key : map.keySet()) {
-                if (map.get(key) == maxCount) {
+            
+            
+            maxMap.put(length, maxCount);
+        }
+        
+        List<String> list = new ArrayList<>();
+        for(int length : course) {
+            int count = maxMap.get(length);
+            for(String key : map.keySet()) {
+                if(key.length() == length && count >= 2 && map.get(key) == count) {
                     list.add(key);
                 }
             }
         }
-
+        
         Collections.sort(list);
-
+        
         String[] answer = new String[list.size()];
-
-        for (int answerIdx = 0; answerIdx < list.size(); answerIdx++) {
-            answer[answerIdx] = list.get(answerIdx);
+        for(int idx = 0; idx < list.size(); idx++) {
+            answer[idx] = list.get(idx);
         }
-
+        
         return answer;
+    }
+    
+    void makeComb(char[] arr, int startIdx, String comb) {
+        if(comb.length() >= 2) {
+            map.put(comb, map.getOrDefault(comb, 0) + 1);
+        }
+        
+        for(int idx = startIdx; idx < arr.length; idx++) {
+            makeComb(arr, idx + 1, comb + arr[idx]);
+        }
     }
 }
