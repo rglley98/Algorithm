@@ -22,7 +22,7 @@ class Solution {
             countMap.put(weight, countMap.getOrDefault(weight, 0) + 1);
         }
         
+        
         return answer;
     }
 }
-
